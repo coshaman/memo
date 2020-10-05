@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Memo</title>
+	<script src="https://code.jquery.com/jquery-2.2.1.js"></script>
+	<!-- 합쳐지고 최소화된 최신 CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+	<!-- 부가적인 테마 -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+	<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+</head>
+<body onload="">
+	<div id = 'memo'></div>
+	<button onclick="plus();" type="button" class="btn btn-info">메모탭 추가</button>
+	<div>
+		<!--<p style="float: left;">정렬방식 설정 : &nbsp;</p>-->
+		<select class="form-control" style="width: 250px; float: left;" id="style" onchange="style2();">
+		  <option selected disabled>정렬방식 설정</option>
+		  <option>기본</option>
+		  <option>한줄에</option>
+		  <option>여유있게</option>
+		  <option>최소화</option>
+		</select>
+	</div>
+	<script> 
+		var entityMap = { 
+			'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;'
+		};
+		function escapeHtml(string) 
+		{ 
+			return String(string).replace(/[&<>"'`=\/]/g, function (s) { 
+				return entityMap[s]; 
+			}); 
+		}
+		let text = localStorage.getItem("mymemotext");
+		let num = localStorage.getItem("sumoftext");
+		if(!text){
+			//localStorage.setItem("mymemotext", JSON.stringify(text))
+			localStorage.setItem("mymemotext", '[""]');
+			text = '[""]';
+		}
+		if(!num){
+			//localStorage.setItem("mymemotext", JSON.stringify(text))
+			localStorage.setItem("sumoftext", '0');
+			num = '0';
+		}
+		text = JSON.parse(text);
+		num = JSON.parse(num);
+		for(var i = num;i > 0;i--){
+			if (text[i] == ""){
+				text.splice(i, 1);
+				num -= 1;
+			}
+		}
+		var returnback = ``;
+		for(var i = 0; i <= num;i++){
+			returnback += `<textarea cols="5" style="width:300px;" class="form-control" id = '${i}' onkeypress="save(${i});">${escapeHtml(text[i])}</textarea>
+<br>`;
+
+		}
+		document.getElementById('memo').innerHTML = returnback;
+		
+		function save(i){
+			text[i] = document.getElementById(i).value;
+			localStorage.setItem("mymemotext", JSON.stringify(text));
+			localStorage.setItem("sumoftext", num);
+		}
+		
+		function plus(){
+			num += 1;
+			text.push('');
+			var returnback = ``;
+			for(var i = 0; i <= num;i++){
+				returnback += `<pre><textarea cols="5" style="width:300px;white-space:pre;" class="form-control" id = '${i}' onkeypress="save(${i});">${escapeHtml(text[i])}</textarea></pre>
+<br>`;
+
+			}
+			document.getElementById('memo').innerHTML = returnback;
+		}
+		function style2(){
+			let style = document.getElementById("style").options[document.getElementById('style').selectedIndex].value;
+			if (style == '한줄에'){
+				var returnback = ``;
+				for(var i = 0; i <= num;i++){
+					returnback += `<textarea rows="10" style="width:${(100 / (num+1)) - 5}%; float : left;white-space:pre;" class="form-control" id = '${i}' onkeypress="save(${i});">${escapeHtml(text[i])}</textarea>
+`;
+
+				}
+				document.getElementById('memo').innerHTML = returnback + '<br><br><br><br><br><br><br><br><br><br><br>';
+			}if (style == '기본'){
+				var returnback = ``;
+				for(var i = 0; i <= num;i++){
+					returnback += `<textarea cols="5" style="width:300px;white-space:pre;" class="form-control" id = '${i}' onkeypress="save(${i});">${escapeHtml(text[i])}</textarea>
+<br>`;
+
+				}
+				document.getElementById('memo').innerHTML = returnback;
+			}if (style == '여유있게'){
+				var returnback = ``;
+				for(var i = 0; i <= num;i++){
+					returnback += `<pre><textarea rows="15" style="width:80vw;white-space:pre;" class="form-control" id = '${i}' onkeypress="save(${i});">${escapeHtml(text[i])}</textarea></pre>
+<br><br><br>`;
+
+				}
+				
+				document.getElementById('memo').innerHTML = returnback;
+			}if (style == '최소화'){
+				var returnback = ``;
+				for(var i = 0; i <= num;i++){
+					returnback += `<textarea rows="1" style="width:100px;white-space:pre;" class="form-control" id = '${i}' onkeypress="save(${i});">${escapeHtml(text[i])}</textarea>
+<br>`;
+
+				}
+				document.getElementById('memo').innerHTML = returnback;
+			}
+		}
+
+	</script>
+</body>
+</html>
